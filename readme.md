@@ -1,4 +1,4 @@
-# 🚀 MinIO Load-Balancing Setup (Docker + Nginx)
+# 🚀 Distributed Storage System
 
 This project sets up two standalone MinIO instances behind an Nginx load balancer using Docker Compose.
 
