@@ -1,0 +1,54 @@
+# Django specific
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media
+
+# If your build process includes running collectstatic, you probably don't need or want to include staticfiles
+/staticfiles
+/static/
+
+# If your build process includes running collectstatic, you probably don't need or want to include staticfiles
+/staticfiles/
+.env
+
+# Ignore the virtual environment directory
+venv/
+env/
+
+# Ignore the local settings file
+local_settings.py
+
+# Ignore the node_modules directory
+node_modules/
+
+# Ignore the coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Ignore the mypy cache
+.mypy_cache/
+
+# Ignore the pytest cache
+.pytest_cache/
+
+# Ignore the pipenv files
+Pipfile.lock
+
+# Ignore the celery beat schedule file
+celerybeat-schedule
+
+# Ignore the translations
+*.mo
+
+# Ignore the migrations
+*/migrations/*
+
+# Ignore the IDE files
+.idea/
+.vscode/
+
+llm-prompt.txt
