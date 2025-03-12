@@ -58,7 +58,7 @@ This will start:
   - Console: `http://localhost:9003`
 
 - **Nginx Load Balancer:**
-  - `http://localhost/`
+  - `http://localhost/80`
 
 ---
 
