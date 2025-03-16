@@ -85,8 +85,7 @@ def download_file(request, file_id):
                 # Compute checksum
                 downloaded_checksum = compute_checksum(data)
                 if downloaded_checksum == chunk.checksum:
-                    print(f"{chunk.chunk_number} : success")
-                    # print(f"Verified Chunk {chunk.chunk_number}: {downloaded_checksum}")
+                    print(f"Verified Chunk {chunk.chunk_number}: {downloaded_checksum}")
                 else:
                     print("failed")
                     print(f"Verify Failed for Chunk {chunk.chunk_number}: Expected {chunk.checksum}, Got {downloaded_checksum}")
