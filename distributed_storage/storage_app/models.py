@@ -16,6 +16,7 @@ class FileChunk(models.Model):
     chunk_number = models.IntegerField()
     chunk_size = models.BigIntegerField()
     chunk_path = models.CharField(max_length=500)
+    checksum = models.CharField(max_length=64, null=True, blank=True)  # New field
 
     def __str__(self):
         return f"{self.file.file_name} - Chunk {self.chunk_number}"

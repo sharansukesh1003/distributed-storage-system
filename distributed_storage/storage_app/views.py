@@ -1,9 +1,10 @@
-import os
 import io
+import time
 import boto3
 from django.conf import settings
 from .forms import FileUploadForm
 from django.shortcuts import render
+from .utils import compute_checksum
 from .models import StoredFile, FileChunk
 from django.http import FileResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -25,7 +26,8 @@ def upload_file_chunked(request):
             file = form.cleaned_data['file']
             file_name = file.name
             file_size = file.size
-            file_id = f"{file_name}_{file_size}"  # Unique ID for chunks
+            current_time_ms = int(time.time() * 1000)
+            file_id = f"{file_name}_{file_size}_{current_time_ms}"  # Unique ID for chunks
 
             # Save metadata for the full file
             stored_file = StoredFile.objects.create(
@@ -41,6 +43,7 @@ def upload_file_chunked(request):
                 if not chunk:
                     break
                 
+                checksum = compute_checksum(chunk)
                 chunk_filename = f"{file_id}_chunk{chunk_number}"
                 s3_client.put_object(
                     Bucket=settings.AWS_STORAGE_BUCKET_NAME,
@@ -48,14 +51,16 @@ def upload_file_chunked(request):
                     Body=chunk
                 )
 
-                # Save chunk metadata
+                # Save chunk metadata with checksum
                 FileChunk.objects.create(
                     file=stored_file,
                     chunk_number=chunk_number,
                     chunk_size=len(chunk),
-                    chunk_path=f"{settings.AWS_S3_ENDPOINT_URL}/{settings.AWS_STORAGE_BUCKET_NAME}/{chunk_filename}"
+                    chunk_path=f"{settings.AWS_S3_ENDPOINT_URL}/{settings.AWS_STORAGE_BUCKET_NAME}/{chunk_filename}",
+                    checksum=checksum
                 )
 
+                print(f"Uploaded Chunk {chunk_number}: {checksum}")
                 chunk_number += 1
 
             return render(request, 'storage_app/upload_success.html', {'file_name': file_name})
@@ -68,18 +73,36 @@ def upload_file_chunked(request):
 def download_file(request, file_id):
     try:
         stored_file = StoredFile.objects.get(file_id=file_id)
-        print(stored_file)
         chunks = FileChunk.objects.filter(file=stored_file).order_by('chunk_number')
 
         file_buffer = io.BytesIO()
-        
-        for chunk in chunks:
-            response = s3_client.get_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=chunk.chunk_path.split('/')[-1])
-            file_buffer.write(response['Body'].read())
 
+        for chunk in chunks:
+            try:
+                response = s3_client.get_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=chunk.chunk_path.split('/')[-1])
+                data = response['Body'].read()
+                
+                # Compute checksum
+                downloaded_checksum = compute_checksum(data)
+                if downloaded_checksum == chunk.checksum:
+                    print(f"{chunk.chunk_number} : success")
+                    # print(f"Verified Chunk {chunk.chunk_number}: {downloaded_checksum}")
+                else:
+                    print("failed")
+                    print(f"Verify Failed for Chunk {chunk.chunk_number}: Expected {chunk.checksum}, Got {downloaded_checksum}")
+                    return HttpResponse("File verification failed", status=500)
+
+                file_buffer.write(data)
+
+            except s3_client.exceptions.NoSuchKey:
+                print(f"Chunk {chunk.chunk_number} is missing in S3.")
+                return HttpResponse(f"Chunk {chunk.chunk_number} is missing.", status=404)
+
+        # Return the file as a response
         file_buffer.seek(0)
         response = FileResponse(file_buffer, as_attachment=True, filename=stored_file.file_name)
         return response
 
     except StoredFile.DoesNotExist:
         return HttpResponse("File not found", status=404)
+
