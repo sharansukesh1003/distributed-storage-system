@@ -1,4 +1,4 @@
-# 🚀 Distributed Storage System
+# 🚀 Sync Sphere - Distributed Storage System
 
 This project sets up two standalone MinIO instances behind an Nginx load balancer using Docker Compose.
 
@@ -58,7 +58,7 @@ This will start:
   - Console: `http://localhost:9003`
 
 - **Nginx Load Balancer:**
-  - `http://localhost/`
+  - `http://localhost/80`
 
 ---
 
