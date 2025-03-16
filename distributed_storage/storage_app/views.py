@@ -5,6 +5,7 @@ from django.conf import settings
 from .forms import FileUploadForm
 from django.shortcuts import render
 from .utils import compute_checksum
+from django.core.cache import cache
 from .models import StoredFile, FileChunk
 from django.http import FileResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -73,6 +74,13 @@ def upload_file_chunked(request):
 def download_file(request, file_id):
     try:
         stored_file = StoredFile.objects.get(file_id=file_id)
+        # Try to get the file from cache
+        cached_file = cache.get(file_id)
+        if cached_file:
+            print("Serving from cache")
+            cached_file_buffer = io.BytesIO(cached_file)
+            cached_file_buffer.seek(0)
+            return FileResponse(cached_file_buffer, as_attachment=True, filename=stored_file.file_name)
         chunks = FileChunk.objects.filter(file=stored_file).order_by('chunk_number')
 
         file_buffer = io.BytesIO()
@@ -81,14 +89,13 @@ def download_file(request, file_id):
             try:
                 response = s3_client.get_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=chunk.chunk_path.split('/')[-1])
                 data = response['Body'].read()
-                
+
                 # Compute checksum
                 downloaded_checksum = compute_checksum(data)
                 if downloaded_checksum == chunk.checksum:
                     print(f"Verified Chunk {chunk.chunk_number}: {downloaded_checksum}")
                 else:
-                    print("failed")
-                    print(f"Verify Failed for Chunk {chunk.chunk_number}: Expected {chunk.checksum}, Got {downloaded_checksum}")
+                    print(f"Verify Failed for Chunk {chunk.chunk_number}")
                     return HttpResponse("File verification failed", status=500)
 
                 file_buffer.write(data)
@@ -97,7 +104,10 @@ def download_file(request, file_id):
                 print(f"Chunk {chunk.chunk_number} is missing in S3.")
                 return HttpResponse(f"Chunk {chunk.chunk_number} is missing.", status=404)
 
-        # Return the file as a response
+        # Cache the file content for future use
+        file_buffer.seek(0)
+        cache.set(file_id, file_buffer.read(), timeout=3600)  # Cache for 1 hour
+
         file_buffer.seek(0)
         response = FileResponse(file_buffer, as_attachment=True, filename=stored_file.file_name)
         return response
