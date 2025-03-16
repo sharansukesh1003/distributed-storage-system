@@ -78,7 +78,6 @@ def download_file(request, file_id):
         cached_file = cache.get(file_id)
         if cached_file:
             print("Serving from cache")
-            # Create a BytesIO object from cached file content and serve it
             cached_file_buffer = io.BytesIO(cached_file)
             cached_file_buffer.seek(0)
             return FileResponse(cached_file_buffer, as_attachment=True, filename=stored_file.file_name)
