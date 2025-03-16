@@ -52,3 +52,5 @@ celerybeat-schedule
 .vscode/
 
 llm-prompt.txt
+minio_storage1/
+minio_storage2/

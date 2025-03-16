@@ -127,7 +127,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MINIO_STORAGE_MEDIA_BUCKET_NAME = "files"
 MINIO_STORAGE_ENDPOINT = "http://localhost:80"  # Nginx endpoint
 MINIO_STORAGE_ACCESS_KEY = "admin"
-MINIO_STORAGE_SECRET_KEY = "adminpassword"
+MINIO_STORAGE_SECRET_KEY = "password"
 
 # Configure Django to use MinIO as storage
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
