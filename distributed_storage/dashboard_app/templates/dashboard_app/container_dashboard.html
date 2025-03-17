@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Container Health and Metrics</title>
+  </head>
+  <body>
+    <h1>Container Health and Metrics Dashboard</h1>
+
+    <h2>Container Health Status</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Container Name</th>
+          <th>Status</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for container in health_info %}
+        <tr>
+          <td>{{ container.name }}</td>
+          <td>{{ container.status }}</td>
+          <td>{{ container.error }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>Container Metrics</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Container Name</th>
+          <th>CPU Usage</th>
+          <th>Memory Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for container in metrics_info %}
+        <tr>
+          <td>{{ container.name }}</td>
+          <td>{{ container.cpu_percent }}%</td>
+          <td>{{ container.memory_usage }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>
