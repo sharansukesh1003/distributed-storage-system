@@ -1,3 +1,4 @@
+import json
 import docker
 from django.shortcuts import render
 
@@ -11,24 +12,24 @@ def container_dashboard(request):
     metrics_info = []
 
     for container in containers:
-        # Get the container name and health status
+        # Get container stats
+        stats = container.stats(stream=False)
+        stats_str = json.dumps(stats, indent=4)  # Optional, for debugging
+        print(stats_str)  # Print JSON data for inspection
+
+        # Collect container info
         container_info = {
             'name': container.name,
             'status': container.status,  # Running, Exited, etc.
         }
 
         try:
-            # Check for errors if the container is stopped or has finished
+            # Get error message if any
             container_state = container.attrs.get('State', {})
             error_message = container_state.get('Error', '')
+            container_info['error'] = error_message if error_message else 'No errors'
             
-            # If there's an error message, include it in the info
-            if error_message:
-                container_info['error'] = error_message
-            else:
-                container_info['error'] = 'No errors'
-            
-            # Check the health status for running containers
+            # Check health status for running containers
             if container.status == "running":
                 health = container_state.get('Health', {}).get('Status', 'N/A')
                 container_info['health'] = health
@@ -38,11 +39,15 @@ def container_dashboard(request):
         health_info.append(container_info)
 
         # Collect container resource usage metrics (CPU, Memory, etc.)
-        stats = container.stats(stream=False)  # Get one snapshot of the container's stats
         metrics_info.append({
             'name': container.name,
-            'cpu_percent': stats['cpu_stats']['cpu_usage']['total_usage'],
+            'cpu_usage': stats['cpu_stats']['cpu_usage']['total_usage'],
             'memory_usage': stats['memory_stats']['usage'],
+            'pids_stats': stats.get('pids_stats', {}).get('current', 'N/A'),
+            'rx_bytes': stats['networks']['eth0'].get('rx_bytes', 0),
+            'tx_bytes': stats['networks']['eth0'].get('tx_bytes', 0),
+            'rx_packets': stats['networks']['eth0'].get('rx_packets', 0),
+            'tx_packets': stats['networks']['eth0'].get('tx_packets', 0),
         })
 
     # Pass the health and metrics info to the template
