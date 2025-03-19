@@ -3,68 +3,141 @@
 {% block title %}Container Health and Metrics{% endblock %}
 
 {% block content %}
-<div class="container my-4">
-  <h1 class="text-center mb-4">Container Health and Metrics Dashboard</h1>
-
-  <!-- CONTAINER INFO -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h4>Container Info</h4>
-    </div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Container Name</th>
-            <th>Status</th>
-            <th>Error</th>
-            <th>Started At</th>
-            <th>IP Address</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for container in health_info %}
-          <tr>
-            <td>{{ container.name }}</td>
-            <td>{{ container.status }}</td>
-            <td>{{ container.error }}</td>
-            <td>{{ container.started_at }}</td>
-            <td>{{ container.ip_address }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h1 class="display-4">Container Health and Metrics Dashboard</h1>
+      <p class="lead">Real-time monitoring of your container environment</p>
     </div>
   </div>
 
-  <!-- CONTAINER METRICS -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h4>Container Metrics</h4>
+  <!-- Container Info & Metrics -->
+  <div class="row my-4">
+    <!-- Container Info Card -->
+    <div class="col-lg-6 mb-2">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          Container Info
+        </div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Container Name</th>
+                <th>Status</th>
+                <th>Error</th>
+                <th>Started At</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for container in health_info %}
+              <tr>
+                <td>{{ container.name }}</td>
+                <td>
+                  {% if container.status == "running" %}
+                    <span class="badge bg-success">{{ container.status }}</span>
+                  {% elif container.status == "exited" %}
+                    <span class="badge bg-danger">{{ container.status }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary">{{ container.status }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if container.error != "No errors" %}
+                    <span class="text-danger">{{ container.error }}</span>
+                  {% else %}
+                    <span class="text-success">{{ container.error }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ container.started_at }}</td>
+                <td>{{ container.ip_address }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <table class="table table-striped mb-4">
-        <thead>
-          <tr>
-            <th>Container Name</th>
-            <th>CPU Usage (%)</th>
-            <th>Memory Usage (MB)</th>
-            <th>RX Bytes</th>
-            <th>TX Bytes</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for container in metrics_info %}
-          <tr>
-            <td>{{ container.name }}</td>
-            <td>{{ container.cpu_usage }}%</td>
-            <td>{{ container.memory_usage }} MB</td>
-            <td>{{ container.rx_bytes }} bytes</td>
-            <td>{{ container.tx_bytes }} bytes</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+    <!-- Container Metrics Card -->
+    <div class="col-lg-6 mb-2">
+      <div class="card h-100">
+        <div class="card-header bg-info text-white">
+          Container Metrics
+        </div>
+        <div class="card-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Container Name</th>
+                <th>CPU Usage (%)</th>
+                <th>Memory Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for container in metrics_info %}
+              <tr>
+                <td>{{ container.name }}</td>
+                <!-- CPU Usage Redesigned -->
+                <td>
+                  {% if container.cpu_usage.0|stringformat:"s" != "N/A" %}
+                    <div class="d-flex justify-content-between mb-1">
+                      <span>CPU Usage</span>
+                      <span>{{ container.cpu_usage.0 }}%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: {{ container.cpu_usage.0 }}%;" aria-valuenow="{{ container.cpu_usage.0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </td>
+                <!-- Memory Usage Redesigned -->
+                <td>
+                  {% if container.memory_usage.0|stringformat:"s" != "N/A" %}
+                    {% widthratio container.memory_usage.0 7526.4 100 as mem_percent %}
+                    <div class="d-flex justify-content-between mb-1">
+                      <span>{{ container.memory_usage.0 }} MB</span>
+                      <span>{{ mem_percent }}%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                      <div class="progress-bar bg-warning" role="progressbar" style="width: {{ mem_percent }}%;" aria-valuenow="{{ mem_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall Stats -->
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card text-center">
+        <div class="card-header bg-secondary text-white">
+          Total Files
+        </div>
+        <div class="card-body">
+          <h2>{{ total_files }}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card text-center">
+        <div class="card-header bg-secondary text-white">
+          Individual File Size Nodes
+        </div>
+        <div class="card-body">
+          <h2>{{ total_chunks }}</h2>
+        </div>
+      </div>
     </div>
   </div>
 </div>

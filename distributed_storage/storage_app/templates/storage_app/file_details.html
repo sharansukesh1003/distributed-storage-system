@@ -1,111 +1,110 @@
 {% extends 'base.html' %} {% load static %} {% block title %}File Details - {{
-file.file_name }}{% endblock %} {% block extra_css %}
-<style>
-  /* Modern Card Styling */
-  .file-card {
-    background: #fff;
-    border-radius: 16px;
-    {% comment %} box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); {% endcomment %}
-    border: 1px solid #d1d1d1;
-    padding: 24px;
-    margin-bottom: 24px;
-    transition: all 0.3s ease;
-  }
-  {% comment %} .file-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  } {% endcomment %}
-
-  /* Header Styling */
-  .file-header {
-    font-size: 20px;
-    font-weight: 600;
-    color: #2c3e50;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .file-header i {
-    color: #4caf50;
-  }
-
-  /* Table Styling */
-  .styled-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .styled-table thead {
-    background: #4caf50;
-    color: white;
-    font-weight: bold;
-  }
-
-  .styled-table th, .styled-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-
-  .styled-table tbody tr:hover {
-    background-color: #f5f5f5;
-  }
-
-  /* Dark Mode */
-  [data-bs-theme="dark"] .file-card {
-    background: #1f1f1f;
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  }
-
-  [data-bs-theme="dark"] .file-header {
-    color: #ddd;
-  }
-
-  [data-bs-theme="dark"] .styled-table thead {
-    background: #66bb6a;
-  }
-  [data-bs-theme="dark"] .styled-table tbody tr:hover {
-    background-color: #333;
-  }
-</style>
-{% endblock %} {% block content %}
-<div class="file-card">
-  <div class="file-header">
-    <i class="fas fa-file-alt"></i> Details for: {{ file.file_name }}
+  file.file_name }}{% endblock %} {% block extra_css %}
+  <style>
+    /* Modern Card Styling */
+    .file-card {
+      background: #fff;
+      border-radius: 16px;
+      {% comment %} box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); {% endcomment %}
+      border: 1px solid #d1d1d1;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: all 0.3s ease;
+    }
+    {% comment %} .file-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    } {% endcomment %}
+  
+    /* Header Styling */
+    .file-header {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  
+    .file-header i {
+      color: #4caf50;
+    }
+  
+    /* Table Styling */
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+  
+    .styled-table thead {
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+    }
+  
+    .styled-table th, .styled-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    .styled-table tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+  
+    /* Dark Mode */
+    [data-bs-theme="dark"] .file-card {
+      background: #1f1f1f;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    }
+  
+    [data-bs-theme="dark"] .file-header {
+      color: #ddd;
+    }
+  
+    [data-bs-theme="dark"] .styled-table thead {
+      background: #66bb6a;
+    }
+    [data-bs-theme="dark"] .styled-table tbody tr:hover {
+      background-color: #333;
+    }
+  </style>
+  {% endblock %} {% block content %}
+  <div class="file-card">
+    <div class="file-header">
+      <i class="fas fa-file-alt"></i> Details for: {{ file.file_name }}
+    </div>
+    <hr />
+    <p>
+      <strong>📅 Uploaded At:</strong> {{ file.uploaded_at|date:"Y-m-d H:i:s" }}
+    </p>
+    <p><strong>📦 File Size:</strong> {{ file.file_size|filesizeformat }}</p>
+    <p><strong>🆔 File ID:</strong> {{ file.file_id }}</p>
+    <p><strong>📂 File Path:</strong> <code>{{ file.file_path }}</code></p>
+  
+    <h6 class="mt-4">🔗 Chunk Information:</h6>
+    <table class="styled-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Chunk Size</th>
+          <th>Checksum</th>
+          <th>Path</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for chunk in chunks %}
+        <tr>
+          <td>{{ chunk.chunk_number }}</td>
+          <td>{{ chunk.chunk_size|filesizeformat }}</td>
+          <td>{{ chunk.checksum }}</td>
+          <td><code>{{ chunk.chunk_path }}</code></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
-  <hr />
-  <p>
-    <strong>📅 Uploaded At:</strong> {{ file.uploaded_at|date:"Y-m-d H:i:s" }}
-  </p>
-  <p><strong>📦 File Size:</strong> {{ file.file_size|filesizeformat }}</p>
-  <p><strong>🆔 File ID:</strong> {{ file.file_id }}</p>
-  <p><strong>📂 File Path:</strong> <code>{{ file.file_path }}</code></p>
-
-  <h6 class="mt-4">🔗 Chunk Information:</h6>
-  <table class="styled-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Chunk Size</th>
-        <th>Checksum</th>
-        <th>Path</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for chunk in chunks %}
-      <tr>
-        <td>{{ chunk.chunk_number }}</td>
-        <td>{{ chunk.chunk_size|filesizeformat }}</td>
-        <td>{{ chunk.checksum }}</td>
-        <td><code>{{ chunk.chunk_path }}</code></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endblock %}
+  {% endblock %}

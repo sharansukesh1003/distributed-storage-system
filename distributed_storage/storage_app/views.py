@@ -146,7 +146,10 @@ def download_file(request, file_id):
 
             except s3_client.exceptions.NoSuchKey:
                 print(f"Chunk {chunk.chunk_number} is missing in S3.")
-                return HttpResponse(f"Chunk {chunk.chunk_number} is missing.", status=404)
+                return HttpResponse(
+                    f"<div style='text-align: center; color: red; margin-top: 30px;'> <h2> Chunk {chunk.chunk_number} is missing.</h2></div>",
+                    status=404,
+                )
 
         # Cache for future (1 hour timeout restored)
         file_buffer.seek(0)  # Seek before caching

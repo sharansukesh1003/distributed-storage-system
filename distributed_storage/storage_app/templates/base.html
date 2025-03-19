@@ -64,9 +64,9 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <!-- Example links -->
-            <li class="nav-item">
+            {% comment %} <li class="nav-item">
               <a class="nav-link" href="{% url 'upload_chunked' %}">Upload</a>
-            </li>
+            </li> {% endcomment %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'upload_chunked' %}">My Files</a>
             </li>
@@ -74,9 +74,9 @@
               <a class="nav-link" href="/dashboard/metrics/">Admin Dashboard</a>
             </li>
           </ul>
-          <button class="btn btn-outline-light" id="darkModeToggle">
+          {% comment %} <button class="btn btn-outline-light" id="darkModeToggle">
             Dark Mode
-          </button>
+          </button> {% endcomment %}
         </div>
       </div>
     </nav>
@@ -93,7 +93,7 @@
       const toggleButton = document.getElementById("darkModeToggle");
 
       // On load, check localStorage
-      if (localStorage.getItem("colorMode") === "dark") {
+      {% comment %} if (localStorage.getItem("colorMode") === "dark") {
         rootElement.setAttribute("data-bs-theme", "dark");
         toggleButton.textContent = "Light Mode";
       } else {
@@ -112,7 +112,7 @@
           localStorage.setItem("colorMode", "light");
           toggleButton.textContent = "Dark Mode";
         }
-      });
+      }); {% endcomment %}
     </script>
 
     {% block extra_js %}{% endblock %}

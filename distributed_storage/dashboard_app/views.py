@@ -46,7 +46,7 @@ def container_dashboard(request):
             container_info = {
                 'name': container.name,
                 'status': container.status,
-                'error': f"Error retrieving info: {str(e)}",
+                'error': f"Error retrieving info",
                 'started_at': 'N/A',
                 'ip_address': 'N/A',
             }
@@ -71,7 +71,7 @@ def container_dashboard(request):
                 'cpu_usage': ['N/A'],  # Changed to a list
                 'memory_usage': ['N/A'],  # Changed to a list
                 'status': container.status,
-                'error': f"Error retrieving info: {str(e)}",
+                'error': f"Error retrieving info",
                 'started_at': 'N/A',
                 'ip_address': 'N/A',
             })

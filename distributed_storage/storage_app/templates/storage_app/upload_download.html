@@ -32,7 +32,7 @@
 
   /* Progress Bar Styling */
   .progress {
-    height: 10px;
+    height: 20px;
     border-radius: 5px;
     overflow: hidden;
     background-color: #e0e0e0;
@@ -113,6 +113,7 @@
     background: linear-gradient(90deg, #4caf50, #8bc34a);
   }
 </style>
+
 {% endblock %} {% block content %}
 <!-- File Import Section -->
 <div class="file-card">
@@ -166,7 +167,7 @@
     <span id="loader-text"></span>
     <div
       id="loader-spinner"
-      class="spinner-border uploading"
+      class=""
       role="status"
       style="display: none"
     >
@@ -221,12 +222,11 @@
         </div>
         <!-- Actions -->
         <div class="file-actions">
-          <a
-            href="{% url 'download' f.file_id %}"
-            class="btn btn-outline-primary btn-sm"
-          >
-            <i class="bi bi-download"></i>
-          </a>
+          <a href="{% url 'download' f.file_id %}" 
+   class="btn btn-outline-primary btn-sm" 
+   onclick="downloadFile(event, '{{ f.file_id }}')">
+   <i class="bi bi-download"></i>
+</a>
           <button
             class="btn btn-outline-danger btn-sm"
             onclick="deleteFile('{{ f.file_id }}')"
@@ -286,6 +286,7 @@
 {% endblock %} 
 {% block extra_js %}
 <script>
+  
   document.addEventListener("DOMContentLoaded", function () {
     const dropArea = document.getElementById("drop-area");
     const fileInput = document.getElementById("id_file");
