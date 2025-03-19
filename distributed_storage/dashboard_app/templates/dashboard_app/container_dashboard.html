@@ -1,50 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Container Health and Metrics</title>
-  </head>
-  <body>
-    <h1>Container Health and Metrics Dashboard</h1>
+{% extends 'base.html' %}
 
-    <h2>Container Health Status</h2>
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Container Name</th>
-          <th>Status</th>
-          <th>Error</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for container in health_info %}
-        <tr>
-          <td>{{ container.name }}</td>
-          <td>{{ container.status }}</td>
-          <td>{{ container.error }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+{% block title %}Container Health and Metrics{% endblock %}
 
-    <h2>Container Metrics</h2>
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Container Name</th>
-          <th>CPU Usage</th>
-          <th>Memory Usage</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for container in metrics_info %}
-        <tr>
-          <td>{{ container.name }}</td>
-          <td>{{ container.cpu_percent }}%</td>
-          <td>{{ container.memory_usage }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </body>
-</html>
+{% block content %}
+<div class="container my-4">
+  <h1 class="text-center mb-4">Container Health and Metrics Dashboard</h1>
+
+  <!-- CONTAINER HEALTH STATUS -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Container Health Status</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Container Name</th>
+            <th>Status</th>
+            <th>Error</th>
+            <th>Health</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for container in health_info %}
+          <tr>
+            <td>{{ container.name }}</td>
+            <td>{{ container.status }}</td>
+            <td>{{ container.error }}</td>
+            <td>{{ container.health }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CONTAINER METRICS -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Container Metrics</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Container Name</th>
+            <th>CPU Usage</th>
+            <th>Memory Usage</th>
+            <th>PID Stats</th>
+            <th>RX Bytes</th>
+            <th>TX Bytes</th>
+            <th>RX Packets</th>
+            <th>TX Packets</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for container in metrics_info %}
+          <tr>
+            <td>{{ container.name }}</td>
+            <td>{{ container.cpu_usage }} (total)</td>
+            <td>{{ container.memory_usage }} bytes</td>
+            <td>{{ container.pids_stats }}</td>
+            <td>{{ container.rx_bytes }} bytes</td>
+            <td>{{ container.tx_bytes }} bytes</td>
+            <td>{{ container.rx_packets }}</td>
+            <td>{{ container.tx_packets }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
