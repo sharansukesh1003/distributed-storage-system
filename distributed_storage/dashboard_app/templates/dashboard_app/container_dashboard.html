@@ -6,10 +6,10 @@
 <div class="container my-4">
   <h1 class="text-center mb-4">Container Health and Metrics Dashboard</h1>
 
-  <!-- CONTAINER INFO -->
+  <!-- CONTAINER HEALTH STATUS -->
   <div class="card mb-4">
     <div class="card-header">
-      <h4>Container Info</h4>
+      <h4>Container Health Status</h4>
     </div>
     <div class="card-body">
       <table class="table table-striped">
@@ -18,8 +18,7 @@
             <th>Container Name</th>
             <th>Status</th>
             <th>Error</th>
-            <th>Started At</th>
-            <th>IP Address</th>
+            <th>Health</th>
           </tr>
         </thead>
         <tbody>
@@ -28,8 +27,7 @@
             <td>{{ container.name }}</td>
             <td>{{ container.status }}</td>
             <td>{{ container.error }}</td>
-            <td>{{ container.started_at }}</td>
-            <td>{{ container.ip_address }}</td>
+            <td>{{ container.health }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -43,24 +41,30 @@
       <h4>Container Metrics</h4>
     </div>
     <div class="card-body">
-      <table class="table table-striped mb-4">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th>Container Name</th>
-            <th>CPU Usage (%)</th>
-            <th>Memory Usage (MB)</th>
+            <th>CPU Usage</th>
+            <th>Memory Usage</th>
+            <th>PID Stats</th>
             <th>RX Bytes</th>
             <th>TX Bytes</th>
+            <th>RX Packets</th>
+            <th>TX Packets</th>
           </tr>
         </thead>
         <tbody>
           {% for container in metrics_info %}
           <tr>
             <td>{{ container.name }}</td>
-            <td>{{ container.cpu_usage }}%</td>
-            <td>{{ container.memory_usage }} MB</td>
+            <td>{{ container.cpu_usage }} (total)</td>
+            <td>{{ container.memory_usage }} bytes</td>
+            <td>{{ container.pids_stats }}</td>
             <td>{{ container.rx_bytes }} bytes</td>
             <td>{{ container.tx_bytes }} bytes</td>
+            <td>{{ container.rx_packets }}</td>
+            <td>{{ container.tx_packets }}</td>
           </tr>
           {% endfor %}
         </tbody>
